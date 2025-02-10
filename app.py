@@ -21,11 +21,25 @@ model = load_model()
 # Class names for predictions
 CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
 
+# Mapping from 38 classes to 3 classes
+CLASS_MAPPING = {
+    0: "Early Blight", 1: "Late Blight", 2: "Healthy", 3: "Early Blight", 4: "Late Blight", 5: "Healthy",
+    6: "Early Blight", 7: "Late Blight", 8: "Healthy", 9: "Early Blight", 10: "Late Blight", 11: "Healthy",
+    12: "Early Blight", 13: "Late Blight", 14: "Healthy", 15: "Early Blight", 16: "Late Blight", 17: "Healthy",
+    18: "Early Blight", 19: "Late Blight", 20: "Healthy", 21: "Early Blight", 22: "Late Blight", 23: "Healthy",
+    24: "Early Blight", 25: "Late Blight", 26: "Healthy", 27: "Early Blight", 28: "Late Blight", 29: "Healthy",
+    30: "Early Blight", 31: "Late Blight", 32: "Healthy", 33: "Early Blight", 34: "Late Blight", 35: "Healthy",
+    36: "Early Blight", 37: "Late Blight"
+}
+
+def map_prediction_to_class(prediction):
+    return CLASS_MAPPING[np.argmax(prediction)]
+
 def verify_model_output_shape(model, class_names):
     # Get the model's output shape
     output_shape = model.output_shape
-    if len(output_shape) > 1 and output_shape[1] != len(class_names):
-        st.error(f"Model output shape {output_shape[1]} does not match the number of class names {len(class_names)}.")
+    if len(output_shape) > 1 and output_shape[1] != 38:
+        st.error(f"Model output shape {output_shape[1]} does not match the expected 38 classes.")
         return False
     return True
 
@@ -60,12 +74,8 @@ def main():
             st.write(f"Predictions shape: {predictions.shape}")
             st.write(f"Predictions: {predictions}")
 
-            # Ensure the predictions match the number of classes
-            if predictions.shape[1] != len(CLASS_NAMES):
-                st.error("Model output does not match the number of class names.")
-                return
-
-            predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
+            # Map the prediction to the desired class
+            predicted_class = map_prediction_to_class(predictions[0])
             confidence = float(np.max(predictions[0])) * 100
 
             # Display results
