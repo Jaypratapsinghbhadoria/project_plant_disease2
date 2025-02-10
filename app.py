@@ -70,7 +70,7 @@ def main():
 
             # Display results
             st.success(f"Prediction: {predicted_class}")
-            st.info(f"Confidence: {confidence:.2f}%")
+            st.info(f"Confidence: {confidence:.2f}%") # Display confidence as a percentage
 
         except Exception as e:
             st.error(f"Error occurred: {str(e)}")
