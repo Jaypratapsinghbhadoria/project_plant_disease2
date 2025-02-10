@@ -45,6 +45,16 @@ def main():
             # Make prediction
             processed_image = preprocess_image(image)
             predictions = model.predict(processed_image)
+            
+            # Debugging information
+            st.write(f"Predictions shape: {predictions.shape}")
+            st.write(f"Predictions: {predictions}")
+
+            # Ensure the predictions match the number of classes
+            if predictions.shape[1] != len(CLASS_NAMES):
+                st.error("Model output does not match the number of class names.")
+                return
+
             predicted_class = CLASS_NAMES[np.argmax(predictions[0])]
             confidence = float(np.max(predictions[0])) * 100
 
