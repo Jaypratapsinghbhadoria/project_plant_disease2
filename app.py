@@ -24,7 +24,8 @@ CLASS_NAMES = ['Healthy', 'Bacterial Spot', 'Early Blight', 'Late Blight', 'Leaf
                'Yellow Leaf Curl Virus']
 
 def preprocess_image(img):
-    img = img.resize((224, 224))
+    # Resize the image to the expected input shape of the model
+    img = img.resize((256, 256))  # Adjust the size to match the model's expected input
     img_array = tf.keras.preprocessing.image.img_to_array(img)
     img_array = tf.expand_dims(img_array, 0)
     return img_array
