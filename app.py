@@ -23,6 +23,18 @@ CLASS_NAMES = ['Healthy', 'Bacterial Spot', 'Early Blight', 'Late Blight', 'Leaf
                'Septoria Leaf Spot', 'Spider Mites', 'Target Spot', 'Mosaic Virus', 
                'Yellow Leaf Curl Virus']
 
+def verify_model_output_shape(model, class_names):
+    # Get the model's output shape
+    output_shape = model.output_shape
+    if len(output_shape) > 1 and output_shape[1] != len(class_names):
+        st.error(f"Model output shape {output_shape[1]} does not match the number of class names {len(class_names)}.")
+        return False
+    return True
+
+# Verify the model's output shape
+if not verify_model_output_shape(model, CLASS_NAMES):
+    st.stop()
+
 def preprocess_image(img):
     # Resize the image to the expected input shape of the model
     img = img.resize((256, 256))  # Adjust the size to match the model's expected input
