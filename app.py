@@ -1,89 +1,60 @@
-import streamlit as st
-import tensorflow as tf
-import numpy as np
-from PIL import Image
 import os
+import json
+from PIL import Image
 
-# Set page configuration
-st.set_page_config(
-    page_title="Plant Disease Detection",
-    page_icon="🌿",
-    layout="centered"
-)
+import numpy as np
+import tensorflow as tf
+import streamlit as st
 
-# Load the model
-@st.cache_resource
-def load_model():
-    return tf.keras.models.load_model('plant_disease_prediction_model.h5')
 
-model = load_model()
+working_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = f"{working_dir}/plant_disease_prediction_model.h5"
+# Load the pre-trained model
+model = tf.keras.models.load_model(model_path)
 
-# Class names for predictions
-CLASS_NAMES = ["Early Blight", "Late Blight", "Healthy"]
+# loading the class names
+class_indices = json.load(open(f"{working_dir}/class_indices.json"))
 
-# Mapping from 38 classes to 3 classes
-CLASS_MAPPING = {
-    0: "Early Blight", 1: "Late Blight", 2: "Healthy", 3: "Early Blight", 4: "Late Blight", 5: "Healthy",
-    6: "Early Blight", 7: "Late Blight", 8: "Healthy", 9: "Early Blight", 10: "Late Blight", 11: "Healthy",
-    12: "Early Blight", 13: "Late Blight", 14: "Healthy", 15: "Early Blight", 16: "Late Blight", 17: "Healthy",
-    18: "Early Blight", 19: "Late Blight", 20: "Healthy", 21: "Early Blight", 22: "Late Blight", 23: "Healthy",
-    24: "Early Blight", 25: "Late Blight", 26: "Healthy", 27: "Early Blight", 28: "Late Blight", 29: "Healthy",
-    30: "Early Blight", 31: "Late Blight", 32: "Healthy", 33: "Early Blight", 34: "Late Blight", 35: "Healthy",
-    36: "Early Blight", 37: "Late Blight"
-}
 
-def map_prediction_to_class(prediction):
-    return CLASS_MAPPING[np.argmax(prediction)]
-
-def verify_model_output_shape(model, class_names):
-    # Get the model's output shape
-    output_shape = model.output_shape
-    if len(output_shape) > 1 and output_shape[1] != 38:
-        st.error(f"Model output shape {output_shape[1]} does not match the expected 38 classes.")
-        return False
-    return True
-
-# Verify the model's output shape
-if not verify_model_output_shape(model, CLASS_NAMES):
-    st.stop()
-
-def preprocess_image(img):
-    # Resize the image to the expected input shape of the model
-    img = img.resize((256, 256))  # Adjust the size to match the model's expected input
-    img_array = tf.keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0)
+# Function to Load and Preprocess the Image using Pillow
+def load_and_preprocess_image(image_path, target_size=(224, 224)):
+    # Load the image
+    img = Image.open(image_path)
+    # Resize the image
+    img = img.resize(target_size)
+    # Convert the image to a numpy array
+    img_array = np.array(img)
+    # Add batch dimension
+    img_array = np.expand_dims(img_array, axis=0)
+    # Scale the image values to [0, 1]
+    img_array = img_array.astype('float32') / 255.
     return img_array
 
-def main():
-    st.title("Plant Disease Detection")
-    st.write("Upload an image of a plant leaf to detect diseases")
 
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+# Function to Predict the Class of an Image
+def predict_image_class(model, image_path, class_indices):
+    preprocessed_img = load_and_preprocess_image(image_path)
+    predictions = model.predict(preprocessed_img)
+    predicted_class_index = np.argmax(predictions, axis=1)[0]
+    predicted_class_name = class_indices[str(predicted_class_index)]
+    return predicted_class_name
 
-    if uploaded_file is not None:
-        try:
-            # Display the uploaded image
-            image = Image.open(uploaded_file)
-            st.image(image, caption='Uploaded Image', use_column_width=True)
-            
-            # Make prediction
-            processed_image = preprocess_image(image)
-            predictions = model.predict(processed_image)
-            
-            # Debugging information
-            st.write(f"Predictions shape: {predictions.shape}")
-            st.write(f"Predictions: {predictions}")
 
-            # Map the prediction to the desired class
-            predicted_class = map_prediction_to_class(predictions[0])
-            confidence = float(np.max(predictions[0])) * 100
+# Streamlit App
+st.title('Plant Disease Classifier')
 
-            # Display results
-            st.success(f"Prediction: {predicted_class}")
-            st.info(f"Confidence: {confidence:.2f}%") # Display confidence as a percentage
+uploaded_image = st.file_uploader("Upload an image...", type=["jpg", "jpeg", "png"])
 
-        except Exception as e:
-            st.error(f"Error occurred: {str(e)}")
+if uploaded_image is not None:
+    image = Image.open(uploaded_image)
+    col1, col2 = st.columns(2)
 
-if __name__ == '__main__':
-    main()
+    with col1:
+        resized_img = image.resize((150, 150))
+        st.image(resized_img)
+
+    with col2:
+        if st.button('Classify'):
+            # Preprocess the uploaded image and predict the class
+            prediction = predict_image_class(model, uploaded_image, class_indices)
+            st.success(f'Prediction: {str(prediction)}')
