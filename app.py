@@ -62,13 +62,16 @@ if uploaded_image is not None:
     with col2:
         # Preprocess the uploaded image and predict the class
         prediction, confidence = predict_image_class(model, uploaded_image, class_indices)
-        st.success(f'Prediction: {prediction}')
-        st.info(f'Confidence: {confidence:.2f}%')
+        if confidence < 80:
+            st.error('Sorry, not able to detect the disease with high confidence.')
+        else:
+            st.success(f'Prediction: {prediction}')
+            st.info(f'Confidence: {confidence:.2f}%')
 
-        # Display additional information
-        st.write("### Additional Information")
-        st.write(f"**Class:** {prediction}")
-        st.write(f"**Confidence:** {confidence:.2f}%")
+            # Display additional information
+            st.write("### Additional Information")
+            st.write(f"**Class:** {prediction}")
+            st.write(f"**Confidence:** {confidence:.2f}%")
 
 
 st.write("""
