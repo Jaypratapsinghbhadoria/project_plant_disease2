@@ -14,7 +14,7 @@ st.set_page_config(
 # Load the model
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model('plant_disease_model.h5')
+    return tf.keras.models.load_model('plant_disease_prediction_model.h5')
 
 model = load_model()
 
