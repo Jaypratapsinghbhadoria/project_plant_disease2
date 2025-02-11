@@ -49,23 +49,6 @@ st.title('🌿 Plant Disease Classifier')
 st.write("Upload an image of a plant leaf to detect diseases")
 
 # Add text indicating the leaves for which the model works perfectly
-st.write("""
-### This model works perfectly for the following leaves:
-- Apple
-- Blueberry
-- Cherry (including sour)
-- Corn (Maize)
-- Grape
-- Orange
-- Peach
-- Pepper (Bell Pepper)
-- Potato
-- Raspberry
-- Soybean
-- Squash
-- Strawberry
-- Tomato
-""")
 
 uploaded_image = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
@@ -86,3 +69,23 @@ if uploaded_image is not None:
         st.write("### Additional Information")
         st.write(f"**Class:** {prediction}")
         st.write(f"**Confidence:** {confidence:.2f}%")
+
+
+st.write("""
+### This model works perfectly for the following leaves:
+- Apple
+- Blueberry
+- Cherry (including sour)
+- Corn (Maize)
+- Grape
+- Orange
+- Peach
+- Pepper (Bell Pepper)
+- Potato
+- Raspberry
+- Soybean
+- Squash
+- Strawberry
+- Tomato
+""")
+
