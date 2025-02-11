@@ -1,9 +1,14 @@
+import os
 import requests
+from groq import Groq
+
+client = Groq(
+    api_key='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',
+)
 
 def generate_text_from_image(image_path, prediction, confidence):
     # Replace 'your_groq_api_endpoint' and 'your_api_key' with actual values
     api_endpoint = "https://api.groq.com/openai/v1/chat/completions"
-    api_key = "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"
     
     with open(image_path, 'rb') as image_file:
         files = {'image': image_file}
@@ -11,10 +16,25 @@ def generate_text_from_image(image_path, prediction, confidence):
             'prediction': prediction,
             'confidence': confidence
         }
-        headers = {'Authorization': f'Bearer {api_key}'}
+        headers = {'Authorization': f'Bearer {client.api_key}'}
         response = requests.post(api_endpoint, files=files, data=data, headers=headers)
         
     if response.status_code == 200:
         return response.json().get('generated_text', 'No text generated')
     else:
+        print(f"Error: {response.status_code}")
+        print(f"Response Content: {response.content}")
         return 'Error in generating text'
+
+def generate_text_from_prediction(prediction, confidence):
+    messages = [
+        {
+            "role": "user",
+            "content": f"Explain the prediction '{prediction}' with a confidence of {confidence:.2f}%.",
+        }
+    ]
+    chat_completion = client.chat.completions.create(
+        messages=messages,
+        model="llama-3.3-70b-versatile",
+    )
+    return chat_completion.choices[0].message.content

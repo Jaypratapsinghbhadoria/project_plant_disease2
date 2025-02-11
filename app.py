@@ -6,7 +6,7 @@ import tempfile
 import numpy as np
 import tensorflow as tf
 import streamlit as st
-from groq_api import generate_text_from_image
+from groq_api import generate_text_from_image, generate_text_from_prediction
 
 # Set page configuration
 st.set_page_config(
@@ -75,13 +75,8 @@ if uploaded_image is not None:
             st.write(f"**Class:** {prediction}")
             st.write(f"**Confidence:** {confidence:.2f}%")
 
-            # Save the uploaded image to a temporary file
-            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
-                temp_file.write(uploaded_image.getbuffer())
-                temp_file_path = temp_file.name
-
             # Generate text using Groq API
-            generated_text = generate_text_from_image(temp_file_path, prediction, confidence)
+            generated_text = generate_text_from_prediction(prediction, confidence)
             st.write("### Generated Text")
             st.write(generated_text)
 
