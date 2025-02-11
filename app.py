@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 import streamlit as st
+from groq_api import generate_text_from_image
 
 # Set page configuration
 st.set_page_config(
@@ -73,6 +74,10 @@ if uploaded_image is not None:
             st.write(f"**Class:** {prediction}")
             st.write(f"**Confidence:** {confidence:.2f}%")
 
+            # Generate text using Groq API
+            generated_text = generate_text_from_image(uploaded_image, prediction, confidence)
+            st.write("### Generated Text")
+            st.write(generated_text)
 
 st.write("""
 ### This model works perfectly for the following leaves:
