@@ -55,16 +55,15 @@ if uploaded_image is not None:
     col1, col2 = st.columns([1, 2])
 
     with col1:
-        st.image(image, caption='Uploaded Image', use_column_width=True)
+        st.image(image, caption='Uploaded Image', use_container_width=True)
 
     with col2:
-        if st.button('Classify'):
-            # Preprocess the uploaded image and predict the class
-            prediction, confidence = predict_image_class(model, uploaded_image, class_indices)
-            st.success(f'Prediction: {prediction}')
-            st.info(f'Confidence: {confidence:.2f}%')
+        # Preprocess the uploaded image and predict the class
+        prediction, confidence = predict_image_class(model, uploaded_image, class_indices)
+        st.success(f'Prediction: {prediction}')
+        st.info(f'Confidence: {confidence:.2f}%')
 
-            # Display additional information
-            st.write("### Additional Information")
-            st.write(f"**Class:** {prediction}")
-            st.write(f"**Confidence:** {confidence:.2f}%")
+        # Display additional information
+        st.write("### Additional Information")
+        st.write(f"**Class:** {prediction}")
+        st.write(f"**Confidence:** {confidence:.2f}%")
