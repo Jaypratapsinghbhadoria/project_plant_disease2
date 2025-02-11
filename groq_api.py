@@ -35,7 +35,7 @@ def generate_text_from_prediction(prediction, confidence, image_path=None):
             }
         ]
         with open(image_path, 'rb') as image_file:
-            files = {'image': image_file}
+            files = {'image': image_file.read()}
             chat_completion = client.chat.completions.create(
                 messages=messages,
                 model="llama-3.3-70b-versatile",
