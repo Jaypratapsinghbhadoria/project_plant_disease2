@@ -66,19 +66,28 @@ if uploaded_image is not None:
         prediction, confidence = predict_image_class(model, uploaded_image, class_indices)
         if confidence < 80:
             st.error('Sorry, not able to detect the disease with high confidence.')
+            # Save the uploaded image to a temporary file
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+                temp_file.write(uploaded_image.getbuffer())
+                temp_file_path = temp_file.name
+
+            # Generate text using Groq API for low confidence
+            generated_text = generate_text_from_prediction(prediction, confidence, temp_file_path)
         else:
             st.success(f'Prediction: {prediction}')
             st.info(f'Confidence: {confidence:.2f}%')
 
-            # Display additional information
-            st.write("### Additional Information")
-            st.write(f"**Class:** {prediction}")
-            st.write(f"**Confidence:** {confidence:.2f}%")
-
-            # Generate text using Groq API
+            # Generate text using Groq API for high confidence
             generated_text = generate_text_from_prediction(prediction, confidence)
-            st.write("### Generated Text")
-            st.write(generated_text)
+
+        # Display additional information
+        st.write("### Additional Information")
+        st.write(f"**Class:** {prediction}")
+        st.write(f"**Confidence:** {confidence:.2f}%")
+
+        # Display generated text
+        st.write("### Generated Text")
+        st.write(generated_text)
 
 st.write("""
 ### This model works perfectly for the following leaves:
