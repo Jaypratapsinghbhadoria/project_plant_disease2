@@ -3,7 +3,7 @@ import requests
 from groq import Groq
 
 client = Groq(
-    api_key='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',
+    api_key=os.getenv('GROQ_API_KEY'),
 )
 
 def generate_text_from_image(image_path, prediction, confidence):
@@ -30,7 +30,7 @@ def generate_text_from_prediction(prediction, confidence):
     messages = [
         {
             "role": "user",
-            "content": f"Explain the prediction '{prediction}' with a confidence of {confidence:.2f}%.",
+            "content": f"Explain the prediction '{prediction}' with a confidence of {confidence:.2f}%. Tells about the disease and the plant if it is not healthy. And tell how to cure it.",
         }
     ]
     chat_completion = client.chat.completions.create(
