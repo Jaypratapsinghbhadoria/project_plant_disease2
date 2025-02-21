@@ -3,7 +3,7 @@ import requests
 from groq import Groq
 
 client = Groq(
-    api_key=os.getenv('GROQ_API_KEY'),
+    api_key='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',
 )
 
 def generate_text_from_image(image_path, prediction, confidence):
